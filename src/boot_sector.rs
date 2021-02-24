@@ -602,7 +602,7 @@ fn try_fs_geometry(
     // Check if volume has enough space to accomodate reserved sectors, FAT, root directory and some data space
     // Having less than 8 sectors for FAT and data would make a little sense
     if total_sectors <= u32::from(reserved_sectors) + root_dir_sectors + 8 {
-        error!("Volume is too small");
+        debug!("Volume is too small");
         return Err(Error::InvalidInput);
     }
 
@@ -621,13 +621,13 @@ fn try_fs_geometry(
         total_sectors - u32::from(reserved_sectors) - root_dir_sectors - sectors_per_fat * u32::from(fats);
     let total_clusters = data_sectors / u32::from(sectors_per_cluster);
     if fat_type != FatType::from_clusters(total_clusters) {
-        error!("Invalid FAT type");
+        debug!("Invalid FAT type");
         return Err(Error::InvalidInput);
     }
     debug_assert!(total_clusters >= fat_type.min_clusters());
     if total_clusters > fat_type.max_clusters() {
         // Note: it can happen for FAT32
-        error!("Too many clusters");
+        debug!("Too many clusters");
         return Err(Error::InvalidInput);
     }
 
