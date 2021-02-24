@@ -210,6 +210,10 @@ impl DirFileEntryData {
         self.size = size;
     }
 
+    pub(crate) fn attributes(&self) -> FileAttributes {
+        self.attrs
+    }
+
     pub(crate) fn is_dir(&self) -> bool {
         self.attrs.contains(FileAttributes::DIRECTORY)
     }
@@ -513,6 +517,22 @@ impl DirEntryEditor {
             self.data.set_modified(date_time);
             self.dirty = true;
         }
+    }
+
+    pub(crate) fn attributes(&self) -> FileAttributes {
+        self.data.attrs
+    }
+
+    pub(crate) fn set_attributes(&mut self, attrs: FileAttributes, value: bool) {
+        let old_attrs = self.data.attrs;
+        if value {
+            // set
+            self.data.attrs |= attrs;
+        } else {
+            // clear
+            self.data.attrs &= !attrs;
+        }
+        self.dirty = old_attrs != self.data.attrs;
     }
 
     pub(crate) fn flush<IO: ReadWriteSeek, TP, OCC>(&mut self, fs: &FileSystem<IO, TP, OCC>) -> Result<(), IO::Error> {

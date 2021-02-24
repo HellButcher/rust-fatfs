@@ -1,7 +1,7 @@
 use core::cmp;
 use core::convert::TryFrom;
 
-use crate::dir_entry::DirEntryEditor;
+use crate::dir_entry::{DirEntryEditor,FileAttributes};
 use crate::error::Error;
 use crate::fs::{FileSystem, ReadWriteSeek};
 use crate::io::{IoBase, Read, Seek, SeekFrom, Write};
@@ -96,6 +96,44 @@ impl<'a, IO: ReadWriteSeek, TP, OCC> File<'a, IO, TP, OCC> {
             e.flush(self.fs)?;
         }
         Ok(())
+    }
+
+    /// Sets hidden-attribute of the file
+    #[deprecated]
+    pub fn attributes(&mut self) -> FileAttributes {
+        if let Some(ref mut e) = self.entry {
+            e.attributes()
+        } else {
+            FileAttributes::default()
+        }
+    }
+    
+    /// Sets hidden-attribute of the file
+    pub fn set_hidden_attribute(&mut self, is_hidden: bool) {
+        if let Some(ref mut e) = self.entry {
+            e.set_attributes(FileAttributes::HIDDEN, is_hidden);
+        }
+    }
+
+    /// Sets system-attribute of the file
+    pub fn set_system_attribute(&mut self, is_system: bool) {
+        if let Some(ref mut e) = self.entry {
+            e.set_attributes(FileAttributes::SYSTEM, is_system);
+        }
+    }
+
+    /// Sets archive-attribute of the file
+    pub fn set_archive_attribute(&mut self, is_archive: bool) {
+        if let Some(ref mut e) = self.entry {
+            e.set_attributes(FileAttributes::ARCHIVE, is_archive);
+        }
+    }
+
+    /// Sets archive-attribute of the file
+    pub fn set_readonly_attribute(&mut self, is_readonly: bool) {
+        if let Some(ref mut e) = self.entry {
+            e.set_attributes(FileAttributes::READ_ONLY, is_readonly);
+        }
     }
 
     /// Sets date and time of creation for this file.
